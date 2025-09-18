@@ -32,7 +32,11 @@ target_include_directories(C_Web PRIVATE
 )
 
 # Definizione per usare DLL dinamica
-target_compile_definitions(C_Web PRIVATE CEF_USE_DYNAMIC_LIB)
+target_compile_definitions(C_Web PRIVATE 
+    CEF_USE_DYNAMIC_LIB 
+    UNICODE 
+    _UNICODE
+)
 
 # Link con librerie CEF + librerie di sistema Windows
 target_link_libraries(C_Web PRIVATE
