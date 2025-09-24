@@ -9,9 +9,9 @@ CefOverride::~CefOverride() {
 
 bool CefOverride::Setup()
 {
-
 	CefMainArgs main_args(this->m_hInstance);
-	m_cefApp = nullptr;
+	
+	m_cefApp = new CefAppOverride();
 	int exit_code = CefExecuteProcess(main_args, m_cefApp, nullptr);
 	if (exit_code >= 0) {
 		return false;
@@ -23,7 +23,6 @@ bool CefOverride::Setup()
 
 	this->m_app = std::make_unique<Application>(this->m_hInstance, L"CefOverrideApp", &WndProc);
 	auto hwndApp = this->m_app->GetHwnd();
-	// Salva il puntatore all’istanza in GWLP_USERDATA
 	SetWindowLongPtr(hwndApp, GWLP_USERDATA, (LONG_PTR)this);
 
 	RECT rect;

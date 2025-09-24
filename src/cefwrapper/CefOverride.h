@@ -1,11 +1,11 @@
 #pragma once
 #include <Windows.h>
 #include "../win/Application.h"
-#include "include/cef_app.h"
 #include "include/cef_client.h"
 #include "include/cef_life_span_handler.h"
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
+#include "CefAppOverride.h"
 class CefOverride : public CefClient, public CefLifeSpanHandler {
 public:
 	CefOverride(HINSTANCE hInstance);
@@ -20,15 +20,20 @@ public:
     void OnAfterCreated(CefRefPtr<CefBrowser> browser) override {
         CEF_REQUIRE_UI_THREAD();
         m_cefBrowser = browser;
+#if DEBUG
+        CefWindowInfo devtools_window_info;
+        CefBrowserSettings devtools_settings;
+        devtools_window_info.SetAsPopup(nullptr, "DevTools");
+        browser->GetHost()->ShowDevTools(devtools_window_info, nullptr, devtools_settings, CefPoint());
+#endif
     }
-
     void ResizeBrowser();
 private:
 	HINSTANCE m_hInstance;
     std::unique_ptr <Application>m_app;
     static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	CefRefPtr<CefApp> m_cefApp;
+	CefRefPtr<CefAppOverride> m_cefApp;
     CefSettings m_settings;
 	CefWindowInfo m_windowInfo;
 	CefBrowserSettings m_browserSettings;
