@@ -24,7 +24,11 @@ endif()
 message(STATUS "CEF_BIN_OS = ${CEF_BIN_OS}")
 # ----------------------------------------------
 
-add_executable(C_Web WIN32 src/main.cpp)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
+    src/*.cpp
+)
+
+add_executable(C_Web WIN32 ${SOURCES})
 
 # Include della cartella include di CEF
 target_include_directories(C_Web PRIVATE
