@@ -68,4 +68,8 @@ if(MSVC)
     set_target_properties(C_Web PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
     )
+    target_compile_definitions(C_Web PRIVATE
+    	$<$<CONFIG:Debug>:DEBUG>
+    )
 endif()
+
