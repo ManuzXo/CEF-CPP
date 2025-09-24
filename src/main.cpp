@@ -8,6 +8,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
 
 	CefMainArgs main_args(hInstance);
 	CefRefPtr<CefAppOverride> app = new CefAppOverride(hInstance);
+
 	int exit_code = CefExecuteProcess(main_args, app, nullptr);
 	if (exit_code >= 0) {
 		return exit_code;

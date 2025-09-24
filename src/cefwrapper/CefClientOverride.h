@@ -6,18 +6,17 @@
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
 #include "CefAppOverride.h"
-#include "CefV8Override.h"
 
 class CefClientOverride : public CefClient, public CefLifeSpanHandler {
 public:
 	CefClientOverride(HINSTANCE hInstance);
     ~CefClientOverride();
-    void Setup(const wchar_t* appName);
-	void Run(const char* url);
 
     CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
     void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 
+    void Setup(const wchar_t* appName);
+	void Run(const char* url);
     void ResizeBrowser();
 private:
 	HINSTANCE m_hInstance;

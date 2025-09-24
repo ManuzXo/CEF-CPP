@@ -7,6 +7,21 @@ CefClientOverride::~CefClientOverride() {
 
 }
 
+CefRefPtr<CefLifeSpanHandler> CefClientOverride::GetLifeSpanHandler(){
+	return this;
+}
+
+void CefClientOverride::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
+	CEF_REQUIRE_UI_THREAD();
+	m_cefBrowser = browser;
+#if DEBUG
+	CefWindowInfo devtools_window_info;
+	CefBrowserSettings devtools_settings;
+	devtools_window_info.SetAsPopup(nullptr, "DevTools");
+	browser->GetHost()->ShowDevTools(devtools_window_info, nullptr, devtools_settings, CefPoint());
+#endif
+}
+
 void CefClientOverride::Setup(const wchar_t* appName)
 {
 	this->m_app = std::make_unique<Application>(this->m_hInstance, appName, &WndProc);
@@ -30,20 +45,7 @@ void CefClientOverride::Run(const char* url)
 	this->m_app->Run();
 	CefShutdown();
 }
-CefRefPtr<CefLifeSpanHandler> CefClientOverride::GetLifeSpanHandler()
-{
-	return this;
-}
-void CefClientOverride::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
-	CEF_REQUIRE_UI_THREAD();
-	m_cefBrowser = browser;
-#if DEBUG
-	CefWindowInfo devtools_window_info;
-	CefBrowserSettings devtools_settings;
-	devtools_window_info.SetAsPopup(nullptr, "DevTools");
-	browser->GetHost()->ShowDevTools(devtools_window_info, nullptr, devtools_settings, CefPoint());
-#endif
-}
+
 void CefClientOverride::ResizeBrowser() {
 	if (m_cefBrowser) {
 		HWND browser_hwnd = m_cefBrowser->GetHost()->GetWindowHandle();
