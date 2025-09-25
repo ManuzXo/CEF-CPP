@@ -32,14 +32,11 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 # Un unico target che cambia tipo in base a BUILD_AS_DLL
-add_library(C_Web SHARED ${SOURCES})
-if(NOT BUILD_AS_DLL)
-    set_target_properties(C_Web PROPERTIES
-        WIN32_EXECUTABLE TRUE
-        OUTPUT_NAME "C_Web"
-    )
-else()
+if(BUILD_AS_DLL)
+    add_library(C_Web SHARED ${SOURCES})
     target_compile_definitions(C_Web PRIVATE BUILD_DLL)
+else()
+    add_executable(C_Web WIN32 ${SOURCES})
 endif()
 
 # Include della cartella include di CEF
