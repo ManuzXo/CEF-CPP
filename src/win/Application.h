@@ -6,7 +6,6 @@ public:
 	typedef LRESULT(CALLBACK* WndProcType)(HWND, UINT, WPARAM, LPARAM);
 	Application(HINSTANCE hInstance, const wchar_t *appName, WndProcType fn);
 	~Application();
-	void Run();
 
 	HINSTANCE GetHinstance() const { return m_hInstance; };
 	std::wstring GetAppName() const { return m_appName; };

@@ -1,7 +1,7 @@
-#include <windows.h>
+#include <Windows.h>
 #include "cefwrapper/CefAppOverride.h"
 #include "cefwrapper/CefClientOverride.h"
-
+#include "win/Application.h"
 int InitCef(HINSTANCE hInstance) {
 	CefMainArgs main_args(hInstance);
 	CefRefPtr<CefAppOverride> app = new CefAppOverride(hInstance);
@@ -15,8 +15,9 @@ int InitCef(HINSTANCE hInstance) {
 	settings.multi_threaded_message_loop = true;
 	CefInitialize(main_args, settings, app, nullptr);
 
-	CefRefPtr<CefClientOverride> g_client = new CefClientOverride(hInstance);
-	g_client->Setup(L"Fantasia");
+	std::unique_ptr <Application>m_app = std::make_unique<Application>(hInstance, L"Fantasia", &CefClientOverride::WndProc);
+	CefRefPtr<CefClientOverride> g_client = new CefClientOverride(hInstance, m_app->GetHwnd());
+	g_client->Setup();
 #if DEBUG
 	g_client->Run("file:///C:/Users/emanu/Documents/Informatica/CEF-CPP/cef_binary/Resources/web/index.html");
 	//g_client->Run("http://localhost:5173/");

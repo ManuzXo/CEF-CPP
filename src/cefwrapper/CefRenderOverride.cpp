@@ -4,6 +4,6 @@ void CefRenderOverride::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPt
     CefRefPtr<CefV8Value> global = context->GetGlobal();
     CefRefPtr<CefV8Override> handler = new CefV8Override();
 
-    handler->RegisterFunction("TestV8", new TestV8());
-    global->SetValue("TestV8", CefV8Value::CreateFunction("TestV8", handler), V8_PROPERTY_ATTRIBUTE_NONE);
+    handler->RegisterFunction("V8_Test", new TestV8());
+    global->SetValue("V8_Test", CefV8Value::CreateFunction("V8_Test", handler), V8_PROPERTY_ATTRIBUTE_NONE);
 }

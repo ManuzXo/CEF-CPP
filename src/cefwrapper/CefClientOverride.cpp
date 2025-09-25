@@ -1,13 +1,7 @@
 #include "CefClientOverride.h"
 
-CefClientOverride::CefClientOverride(HINSTANCE hInstance) {
-	this->m_hInstance = hInstance;
-}
-CefClientOverride::~CefClientOverride() {
 
-}
-
-CefRefPtr<CefLifeSpanHandler> CefClientOverride::GetLifeSpanHandler(){
+CefRefPtr<CefLifeSpanHandler> CefClientOverride::GetLifeSpanHandler() {
 	return this;
 }
 
@@ -22,15 +16,13 @@ void CefClientOverride::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 #endif
 }
 
-void CefClientOverride::Setup(const wchar_t* appName)
+void CefClientOverride::Setup()
 {
-	this->m_app = std::make_unique<Application>(this->m_hInstance, appName, &WndProc);
-	auto hwndApp = this->m_app->GetHwnd();
-	SetWindowLongPtr(hwndApp, GWLP_USERDATA, (LONG_PTR)this);
+	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 	RECT rect;
-	GetClientRect(hwndApp, &rect);
+	GetClientRect(m_hwnd, &rect);
 	CefRect cefRect(0, 0, rect.right - rect.left, rect.bottom - rect.top);
-	m_windowInfo.SetAsChild(hwndApp, cefRect);
+	m_windowInfo.SetAsChild(m_hwnd, cefRect);
 }
 
 void CefClientOverride::Run(const char* url)
@@ -42,7 +34,11 @@ void CefClientOverride::Run(const char* url)
 		m_browserSettings,
 		nullptr,
 		nullptr);
-	this->m_app->Run();
+	MSG msg;
+	while (GetMessage(&msg, nullptr, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	CefShutdown();
 }
 
@@ -50,9 +46,8 @@ void CefClientOverride::ResizeBrowser() {
 	if (m_cefBrowser) {
 		HWND browser_hwnd = m_cefBrowser->GetHost()->GetWindowHandle();
 		if (browser_hwnd) {
-			auto hwndApp = this->m_app->GetHwnd();
 			RECT rect;
-			GetClientRect(hwndApp, &rect);
+			GetClientRect(m_hwnd, &rect);
 			SetWindowPos(browser_hwnd, nullptr,
 				0, 0,
 				rect.right - rect.left,

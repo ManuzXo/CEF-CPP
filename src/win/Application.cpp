@@ -20,14 +20,6 @@ Application::Application(HINSTANCE hInstance, const wchar_t* appName, WndProcTyp
         nullptr, nullptr, hInstance, nullptr
     );
 }
-Application::~Application()
-{
+Application::~Application(){
     m_hwnd = nullptr;
 }
-void Application::Run() {
-    MSG msg;
-    while (GetMessage(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-}   
