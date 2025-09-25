@@ -21,7 +21,6 @@ public:
 private:
 	HINSTANCE m_hInstance;
     HWND m_hwnd;
-	CefRefPtr<CefAppOverride> m_cefApp;
 	CefWindowInfo m_windowInfo;
 	CefBrowserSettings m_browserSettings;
 
