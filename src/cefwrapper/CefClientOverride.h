@@ -8,7 +8,8 @@
 
 class CefClientOverride : public CefClient, public CefLifeSpanHandler {
 public:
-    CefClientOverride(HINSTANCE hInstance, HWND hwnd) : m_hInstance(hInstance), m_hwnd(hwnd) {};
+    CefClientOverride(HINSTANCE hInstance, HWND hwnd, CefSettings settings)
+        : m_hInstance(hInstance), m_hwnd(hwnd), m_cefSettings(settings) {};
     ~CefClientOverride() {};
 
     CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
@@ -18,6 +19,7 @@ public:
 	void Run(const char* url);
     void ResizeBrowser();
     static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	CefSettings m_cefSettings;
 private:
 	HINSTANCE m_hInstance;
     HWND m_hwnd;

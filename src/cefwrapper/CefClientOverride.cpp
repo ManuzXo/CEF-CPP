@@ -35,9 +35,25 @@ void CefClientOverride::Run(const char* url)
 		nullptr,
 		nullptr);
 	MSG msg;
-	while (GetMessage(&msg, nullptr, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	if (m_cefSettings.multi_threaded_message_loop) {
+		// CEF gestisce il suo loop da solo.
+		// Se hai una finestra, tieni un loop messaggi standard.
+		while (GetMessage(&msg, nullptr, 0, 0) > 0) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	else {
+		// Devi tu gestire il loop di CEF.
+		// Variante semplice: blocca qui finché non chiami CefQuitMessageLoop().
+		CefRunMessageLoop();
+		// Oppure, se vuoi controllo esplicito:
+		// while (GetMessage(&msg, nullptr, 0, 0) > 0) {
+		//     TranslateMessage(&msg);
+		//     DispatchMessage(&msg);
+		//     CefDoMessageLoopWork();
+		// }
+		// CefShutdown();
 	}
 	CefShutdown();
 }
@@ -57,15 +73,22 @@ void CefClientOverride::ResizeBrowser() {
 	}
 }
 LRESULT CALLBACK CefClientOverride::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	CefClientOverride* cefApp = (CefClientOverride*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	switch (msg) {
 	case WM_SIZE:
 	{
-		CefClientOverride* cefApp = (CefClientOverride*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-		if (cefApp) {
+		if (cefApp)
 			cefApp->ResizeBrowser();
-		}
 	}
 	break;
+	case WM_CLOSE:
+		if (cefApp) {
+			if (cefApp->m_cefSettings.multi_threaded_message_loop)
+				PostQuitMessage(0);
+			else
+				CefQuitMessageLoop();
+		}
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
