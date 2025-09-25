@@ -24,18 +24,30 @@ endif()
 message(STATUS "CEF_BIN_OS = ${CEF_BIN_OS}")
 # ----------------------------------------------
 
+# Opzione: EXE o DLL (default EXE)
+option(BUILD_AS_DLL "Build as DLL instead of Win32 EXE" OFF)
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
 )
 
-add_executable(C_Web WIN32 ${SOURCES})
+# Un unico target che cambia tipo in base a BUILD_AS_DLL
+add_library(C_Web SHARED ${SOURCES})
+if(NOT BUILD_AS_DLL)
+    set_target_properties(C_Web PROPERTIES
+        WIN32_EXECUTABLE TRUE
+        OUTPUT_NAME "C_Web"
+    )
+else()
+    target_compile_definitions(C_Web PRIVATE BUILD_DLL)
+endif()
 
 # Include della cartella include di CEF
 target_include_directories(C_Web PRIVATE
     ${CEF_ROOT}
 )
 
-# Definizione per usare DLL dinamica
+# Definizioni comuni
 target_compile_definitions(C_Web PRIVATE 
     CEF_USE_DYNAMIC_LIB 
     UNICODE 
@@ -51,25 +63,24 @@ target_link_libraries(C_Web PRIVATE
     rpcrt4.lib
 )
 
-# Copia dei DLL di CEF accanto all'eseguibile
+# Copia dei DLL di CEF accanto all'output
 add_custom_command(TARGET C_Web POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CEF_BIN_OS}/bin $<TARGET_FILE_DIR:C_Web>
 )
 
-# Copia della cartella Resources accanto all'eseguibile
+# Copia della cartella Resources accanto all'output
 add_custom_command(TARGET C_Web POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CEF_ROOT}/Resources $<TARGET_FILE_DIR:C_Web>
 )
 
-# Forza runtime /MT per tutte le configurazioni (Debug e Release)
+# Forza runtime /MT
 if(MSVC)
     set_target_properties(C_Web PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
     )
     target_compile_definitions(C_Web PRIVATE
-    	$<$<CONFIG:Debug>:DEBUG>
+        $<$<CONFIG:Debug>:DEBUG>
     )
 endif()
-

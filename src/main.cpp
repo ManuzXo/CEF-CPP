@@ -2,10 +2,7 @@
 #include "cefwrapper/CefAppOverride.h"
 #include "cefwrapper/CefClientOverride.h"
 
-
-
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
-
+int InitCef(HINSTANCE hInstance) {
 	CefMainArgs main_args(hInstance);
 	CefRefPtr<CefAppOverride> app = new CefAppOverride(hInstance);
 
@@ -29,3 +26,36 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
 	return 0;
 }
 
+
+#ifdef BUILD_DLL
+// ===== DLL MODE =====
+DWORD WINAPI MainThread(LPVOID lpParam)
+{
+	HINSTANCE hModule = (HINSTANCE)lpParam;
+
+	AllocConsole();
+	FILE* f;
+	freopen_s(&f, "CONOUT$", "w", stdout);
+
+	return InitCef(hModule);
+}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+	switch (fdwReason)
+	{
+	case DLL_PROCESS_ATTACH:
+		DisableThreadLibraryCalls(hinstDLL);
+		CreateThread(nullptr, 0, MainThread, hinstDLL, 0, nullptr);
+		break;
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	return TRUE;
+}
+#else
+// ===== EXE MODE =====
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
+	return InitCef(hInstance);
+}
+#endif
