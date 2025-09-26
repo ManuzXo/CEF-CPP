@@ -66,6 +66,6 @@ BOOL WINAPI DllMain(
 #else
 // ===== EXE MODE =====
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
-	return InitCef(hInstance);
+	return CefMain(hInstance);
 }
 #endif
